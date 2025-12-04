@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Servidor MTA:SA - Santa Luzia RP</title>
     <style>
         body { 
@@ -65,7 +65,6 @@
             width: 100%;
             font-weight: bold;
             transition: 0.3s;
-            margin: 10px 0;
         }
         .connect-btn:hover { 
             background: linear-gradient(45deg, #0077ff, #0055cc);
@@ -110,29 +109,6 @@
             transform: translateY(-6px) scale(1.03);
             filter: drop-shadow(0 0 28px rgba(0,200,255,1));
         }
-        .music-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: rgba(0,160,255,0.9);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,160,255,0.5);
-            transition: all 0.3s;
-            z-index: 1000;
-        }
-        .music-btn:hover {
-            background: rgba(0,200,255,1);
-            transform: scale(1.1);
-        }
-        .music-btn.active {
-            background: rgba(0,255,0,0.9);
-        }
         @media (max-width: 900px) {
             .char-img {
                 position: static;
@@ -140,27 +116,17 @@
                 margin: 20px auto 0 auto;
                 max-height: 260px;
             }
-            .music-btn {
-                bottom: 15px;
-                right: 15px;
-                width: 50px;
-                height: 50px;
-                font-size: 16px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Música de fundo -->
+    <!-- Música de fundo, autoplay ao carregar a página -->
     <audio id="bg-music" src="musica.mp3" loop preload="auto"></audio>
-    
-    <!-- Botão de som -->
-    <button id="music-toggle" class="music-btn" title="Ativar/Desativar música">🔊</button>
 
-    <div class="container">
+    <div class="container" id="container">
         <div class="top-row">
             <div class="logo-bar">
-                <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
+                <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img" />
             </div>
             <h1>🥷 Servidor MTA:SA - Santa Luzia RP 🥷</h1>
 
@@ -169,69 +135,49 @@
                 <div id="status" class="status">A carregar status do servidor...</div>
                 <ul id="players"></ul>
                 <button class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
-                <button class="connect-btn" onclick="openServerList()" style="background: linear-gradient(45deg, #ffaa00, #ff7700); margin-top: 5px;">📋 Lista Oficial MTA</button>
             </section>
         </div>
 
         <!-- Personagem -->
-        <img src="person.png" alt="Personagem" class="char-img">
+        <img src="person.png" alt="Personagem" class="char-img" />
     </div>
 
     <script>
-        const SERVER_IP   = '173.212.194.106';
+        const SERVER_IP = '173.212.194.106';
         const SERVER_PORT = 22003;
-        const API_URL     = 'https://mtasa-status-api.vercel.app/api/status';
-        
+        const API_URL = 'https://mtasa-status-api.vercel.app/api/status';
+
         const music = document.getElementById('bg-music');
-        const musicBtn = document.getElementById('music-toggle');
-        let musicEnabled = false;
 
-        // Controles de música corrigidos
-        musicBtn.addEventListener('click', toggleMusic);
-        document.addEventListener('click', enableMusicOnFirstClick, { once: true });
-
-        function enableMusicOnFirstClick() {
-            if (!musicEnabled) {
-                music.play().catch(e => console.log('Música iniciada após clique'));
-            }
-        }
-
-        function toggleMusic() {
-            if (musicEnabled) {
-                music.pause();
-                musicBtn.textContent = '🔇';
-                musicBtn.classList.remove('active');
-            } else {
+        // Tocar música imediatamente ao carregar página ou com qualquer interação na tela (inclui passar mouse)
+        function playMusic() {
+            if (music.paused) {
                 music.play().catch(e => {
-                    console.log('Autoplay bloqueado pelo browser');
-                    alert('Clique em "Conectar" primeiro para ativar som!');
+                    // Pode falhar em alguns browsers por políticas autoplay
+                    console.log('Falha ao tentar tocar música automaticamente.', e);
                 });
-                musicBtn.textContent = '🔊';
-                musicBtn.classList.add('active');
             }
-            musicEnabled = !musicEnabled;
         }
 
-        // Conexão MTA corrigida
+        // Tenta tocar ao carregar a página
+        window.addEventListener('load', playMusic);
+
+        // Também ativa ao passar o mouse ou clicar em qualquer lugar da tela (uma vez)
+        const interactionEvents = ['click', 'mousemove', 'touchstart'];
+        const container = document.getElementById('container');
+        function interactionHandler() {
+            playMusic();
+            interactionEvents.forEach(ev => container.removeEventListener(ev, interactionHandler));
+        }
+        interactionEvents.forEach(ev => container.addEventListener(ev, interactionHandler));
+
+        // Função de conexão para o MTA clicando no botão
         function connectMTA() {
             const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
-            console.log('Tentando conectar:', url);
-            
-            // Tenta conectar
             window.location.href = url;
-            
-            // Fallback após 3 segundos
-            setTimeout(() => {
-                console.log('Fallback: abrindo lista MTA');
-                openServerList();
-            }, 3000);
         }
 
-        function openServerList() {
-            window.open('https://community.multitheftauto.com/?p=servers&q=santa+luzia', '_blank');
-        }
-
-        // Status do servidor com melhor tratamento de erro
+        // Status do servidor com tratamento de erros
         async function fetchStatus() {
             const statusEl = document.getElementById('status');
             const playersEl = document.getElementById('players');
@@ -268,7 +214,7 @@
 
                 if (Array.isArray(data.players) && data.players.length) {
                     playersEl.innerHTML = data.players
-                        .slice(0, 10) // Limita a 10 jogadores
+                        .slice(0, 10)
                         .map(p => `<li>${p.name} - ${p.ping}ms</li>`)
                         .join('');
                     if (data.players.length > 10) {
@@ -282,23 +228,14 @@
                 console.log('Erro API:', e.message);
                 statusEl.innerHTML = `
                     <strong style="color:#ff6666;">🔴 Status indisponível</strong><br>
-                    <small>IP: ${SERVER_IP}:${SERVER_PORT} | 
-                    <a href="#" onclick="connectMTA()" style="color:#00aaff;">Testar conexão</a> | 
-                    <a href="https://community.multitheftauto.com/?p=servers&q=santa+luzia" target="_blank" style="color:#00aaff;">Lista MTA</a>
-                    </small>
+                    <small>IP: ${SERVER_IP}:${SERVER_PORT}</small>
                 `;
-                playersEl.innerHTML = '<li style="color:#ff6666;">Verifique lista oficial MTA</li>';
+                playersEl.innerHTML = '<li style="color:#ff6666;">Verifique servidor ou tente novamente.</li>';
             }
         }
 
-        // Atualiza status a cada 30s e inicia imediatamente
         setInterval(fetchStatus, 30000);
         fetchStatus();
-
-        // Ativa música no primeiro clique em qualquer botão principal
-        document.querySelector('.connect-btn').addEventListener('click', () => {
-            if (!musicEnabled) toggleMusic();
-        });
-    </script>    
+    </script>
 </body>
 </html>
