@@ -89,29 +89,27 @@
     <script>
         const SERVER_IP   = '173.212.194.106';
         const SERVER_PORT = 22003;
-
-        // TROCA ESTE URL PELO DA TUA VERCEL
-        const API_URL = 'https://TEU-PROJETO.vercel.app/api/status';
-
+        const API_URL     = 'https://mtasa-status-api.vercel.app/api/status';
+    
         async function fetchStatus() {
             const statusEl  = document.getElementById('status');
             const playersEl = document.getElementById('players');
-
+    
             statusEl.innerHTML  = '<strong>🔄 Carregando...</strong>';
             playersEl.innerHTML = '';
-
+    
             try {
                 const res  = await fetch(API_URL);
-                if (!res.ok) throw new Error('Erro no proxy/API');
-                const data = await res.json(); // JSON vindo da função Vercel [web:192][web:199]
-
+                if (!res.ok) throw new Error('API error');
+                const data = await res.json();  // já vem nesse formato que mostraste
+    
                 statusEl.innerHTML = `
                     <strong style="color:${data.playerCount > 0 ? '#00ff88' : '#ffaa00'};">
                         ${data.playerCount > 0 ? '🟢 Online' : '🟡 Online (sem jogadores)'}
                     </strong> | ${data.playerCount}/${data.playerSlots} Jogadores | Mapa: ${data.mapName}<br>
                     Versão: ${data.version} | Senha: ${data.passworded ? 'Sim' : 'Não'}
                 `;
-
+    
                 if (Array.isArray(data.players) && data.players.length) {
                     playersEl.innerHTML = data.players
                         .map(p => `<li>${p.name} - ${p.ping} ms</li>`)
@@ -121,15 +119,17 @@
                 }
             } catch (e) {
                 statusEl.innerHTML = '<strong style="color:#ff6666;">🔴 Offline ou erro ao consultar.</strong>';
+                playersEl.innerHTML = '';
             }
         }
-
+    
         function connectMTA() {
             window.location.href = `mtasa://join/${SERVER_IP}:${SERVER_PORT}`;
         }
-
+    
         setInterval(fetchStatus, 30000);
         fetchStatus();
-    </script>
+    </script>    
 </body>
 </html>
+
