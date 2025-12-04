@@ -137,29 +137,43 @@
             transform: scale(1.15);
             filter: drop-shadow(0 0 20px rgba(0,200,255,1));
         }
-        /* ANIMAÇÃO ESPECIAL DO BOTÃO CONECTAR */
+        /* ANIMAÇÃO NOVA: ZOOM + RODA 5s + RODA DNV + VOLTA */
         .logo-img.connect-anim {
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
-            transform: translate(-50%, -50%) scale(3) rotate(360deg) !important;
+            transform: translate(-50%, -50%) scale(3) !important;
             z-index: 1000 !important;
             max-height: 200px !important;
             filter: drop-shadow(0 0 40px rgba(0,200,255,1)) !important;
-            animation: logoConnectAnim 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            animation: logoConnectAnim 7s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
         }
         @keyframes logoConnectAnim {
             0% {
-                transform: translate(-50%, -50%) scale(3) rotate(360deg);
+                transform: translate(-50%, -50%) scale(3);
                 filter: drop-shadow(0 0 40px rgba(0,200,255,1));
             }
+            20% {
+                transform: translate(-50%, -50%) scale(4) rotate(360deg);
+            }
+            25% {
+                transform: translate(-50%, -50%) scale(4);
+            }
+            45% {
+                transform: translate(-50%, -50%) scale(4) rotate(720deg);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(4);
+            }
             70% {
-                transform: translate(-50%, -50%) scale(4) rotate(540deg);
-                filter: drop-shadow(0 0 60px rgba(0,255,150,1));
+                transform: translate(-50%, -50%) scale(3);
             }
             100% {
-                transform: translate(-50%, -50%) scale(0);
-                filter: drop-shadow(0 0 0 rgba(0,255,150,0));
+                transform: translate(-50%, -50%) scale(1) rotate(1080deg);
+                filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
             }
         }
         .char-img {
@@ -233,6 +247,7 @@
         const logo = document.getElementById('logoAnim');
         const connectBtn = document.getElementById('connectBtn');
         let musicPlayed = false;
+        let connecting = false;
 
         // Função para tentar tocar música
         function tryPlayMusic() {
@@ -257,25 +272,31 @@
             }, { once: true, passive: true });
         });
 
-        // CONEXÃO MTA COM ANIMAÇÃO ÉPICA DA LOGO
+        // CONEXÃO MTA COM ANIMAÇÃO DE 7 SEGUNDOS
         function connectMTA() {
-            // Animação da logo
+            if (connecting) return;
+            connecting = true;
+            
+            // Animação da logo (7 segundos)
             logo.classList.add('connect-anim');
             connectBtn.classList.add('connecting');
             connectBtn.textContent = '🚀 Conectando...';
             
-            // Toca MTA após 1.2s (duração da animação)
+            // Abre MTA após 7 segundos (duração total da animação)
             setTimeout(() => {
                 const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
                 window.location.href = url;
-            }, 1200);
+            }, 7000);
         }
 
-        // Remove animação quando voltar (caso MTA falhe)
+        // Reseta animação quando terminar (se MTA não abrir)
         logo.addEventListener('animationend', () => {
-            logo.classList.remove('connect-anim');
-            connectBtn.classList.remove('connecting');
-            connectBtn.textContent = '🚀 Conectar ao Servidor';
+            setTimeout(() => {
+                logo.classList.remove('connect-anim');
+                connectBtn.classList.remove('connecting');
+                connectBtn.textContent = '🚀 Conectar ao Servidor';
+                connecting = false;
+            }, 100);
         });
 
         // Status do servidor
