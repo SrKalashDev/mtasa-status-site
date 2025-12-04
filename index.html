@@ -100,14 +100,15 @@
         /* personagem “fora” do card */
         .char-img {
             position: absolute;
-            right: -40px;              /* ajusta para mais/menos fora */
-            bottom: -20px;
+            right: -80px;   /* mais para a direita (aumenta se quiseres ainda mais) */
+            bottom: -40px;  /* mais para baixo (valor mais negativo = desce) */
             max-height: 320px;
             width: auto;
             filter: drop-shadow(0 0 18px rgba(0,160,255,0.8));
             transition: transform 0.3s ease, filter 0.3s ease;
             transform-origin: bottom center;
         }
+
         .char-img:hover {
             transform: translateY(-6px) scale(1.03);
             filter: drop-shadow(0 0 28px rgba(0,200,255,1));
@@ -199,3 +200,4 @@
     </script>    
 </body>
 </html>
+
