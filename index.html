@@ -30,33 +30,11 @@
             border: 2px solid rgba(0,160,255,0.8);
             box-shadow: 0 0 30px rgba(0,160,255,0.7);
             color: #7fd0ff;
+            position: relative;          /* permite posicionar personagem por cima */
+            overflow: visible;           /* deixa sair para fora */
         }
         .top-row {
-            display: flex;
-            gap: 20px;
-            align-items: flex-start;
-        }
-        .left-col {
-            flex: 1 1 0;
-        }
-        .char-col {
-            flex: 0 0 260px;              /* um pouco mais largo */
-            display: flex;
-            justify-content: flex-end;
-            align-items: flex-end;
-            margin-right: -40px;          /* puxa o card para fora, encostando à borda */
-        }
-
-        .char-img {
-            max-height: 320px;
-            width: auto;
-            filter: drop-shadow(0 0 18px rgba(0,160,255,0.8));
-            transition: transform 0.3s ease, filter 0.3s ease;
-            transform-origin: bottom center;
-        }
-        .char-img:hover {
-            transform: translateY(-6px) scale(1.03);
-            filter: drop-shadow(0 0 28px rgba(0,200,255,1));
+            display: block;
         }
 
         h1 { 
@@ -118,41 +96,54 @@
             object-fit: contain;
             filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
         }
+
+        /* personagem “fora” do card */
+        .char-img {
+            position: absolute;
+            right: -40px;              /* ajusta para mais/menos fora */
+            bottom: -20px;
+            max-height: 320px;
+            width: auto;
+            filter: drop-shadow(0 0 18px rgba(0,160,255,0.8));
+            transition: transform 0.3s ease, filter 0.3s ease;
+            transform-origin: bottom center;
+        }
+        .char-img:hover {
+            transform: translateY(-6px) scale(1.03);
+            filter: drop-shadow(0 0 28px rgba(0,200,255,1));
+        }
+
         @media (max-width: 900px) {
-            .top-row {
-                flex-direction: column;
-            }
-            .char-col {
-                order: -1;
-                justify-content: center;
+            .char-img {
+                position: static;
+                display: block;
+                margin: 20px auto 0 auto;
+                max-height: 260px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- música de fundo: toca em mute e liga som no primeiro clique [web:338][web:345] -->
+    <!-- música de fundo (mute até primeiro clique) -->
     <audio id="bg-music" src="musica.mp3" autoplay loop muted></audio>
 
     <div class="container">
         <div class="top-row">
-            <div class="left-col">
-                <div class="logo-bar">
-                    <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
-                </div>
-                <h1>🥷 Servidor MTA:SA - Santa Luzia RP 🥷</h1>
-
-                <section>
-                    <h2 style="margin-top:0;">📊 Status do Servidor</h2>
-                    <div id="status" class="status">A carregar status do servidor...</div>
-                    <ul id="players"></ul>
-                    <button class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
-                </section>
+            <div class="logo-bar">
+                <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
             </div>
+            <h1>🥷 Servidor MTA:SA - Santa Luzia RP 🥷</h1>
 
-            <div class="char-col">
-                <img src="person.png" alt="Personagem" class="char-img">
-            </div>
+            <section>
+                <h2 style="margin-top:0;">📊 Status do Servidor</h2>
+                <div id="status" class="status">A carregar status do servidor...</div>
+                <ul id="players"></ul>
+                <button class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
+            </section>
         </div>
+
+        <!-- personagem sobressaído no canto inferior direito -->
+        <img src="person.png" alt="Personagem" class="char-img">
     </div>
 
     <script>
@@ -162,7 +153,7 @@
 
         const music = document.getElementById('bg-music');
 
-        // No primeiro clique em qualquer lado, ativa o som da música [web:338][web:345]
+        // No primeiro clique em qualquer lado, ativa o som da música
         document.addEventListener('click', () => {
             music.muted = false;
         }, { once: true });
@@ -208,4 +199,3 @@
     </script>    
 </body>
 </html>
-
