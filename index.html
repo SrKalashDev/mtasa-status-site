@@ -112,13 +112,15 @@
             align-items: center;
             margin-bottom: 8px;
         }
+        .logo-img, .char-img {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
+            transform-origin: center;
+        }
         .logo-img {
             max-height: 80px;
             width: auto;
             object-fit: contain;
-            filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
-            transition: all 0.3s ease;
-            transform-origin: center;
         }
         .logo-img:hover {
             transform: scale(1.15);
@@ -130,10 +132,8 @@
             bottom: -80px;
             max-height: 320px;
             width: auto;
-            filter: drop-shadow(0 0 18px rgba(0,160,255,0.8));
-            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            transform-origin: bottom center;
-            pointer-events: none;
+            z-index: 10;
+            cursor: pointer;
         }
         .char-img:hover {
             transform: translateY(-12px) scale(1.08);
@@ -145,7 +145,7 @@
                 padding: 20px;
             }
             .char-img {
-                position: static;
+                position: static !important;
                 display: block;
                 margin: 20px auto 0 auto;
                 max-height: 260px;
@@ -181,7 +181,7 @@
             </section>
         </div>
 
-        <!-- Personagem -->
+        <!-- Personagem - AGORA COM HOVER FUNCIONANDO -->
         <img src="person.png" alt="Personagem" class="char-img">
     </div>
 
