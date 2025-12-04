@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servidor MTA:SA - Santa Luzia RP</title>
     <style>
         * {
@@ -33,20 +33,17 @@
             max-height: 100vh;
             margin: 20px;
             padding: 30px;
-            background: rgba(10, 10, 20, 0.95);
+            background: rgba(10,10,20,0.95);
             border-radius: 15px;
-            border: 2px solid rgba(0, 160, 255, 0.8);
-            box-shadow: 0 0 30px rgba(0, 160, 255, 0.7);
+            border: 2px solid rgba(0,160,255,0.8);
+            box-shadow: 0 0 30px rgba(0,160,255,0.7);
             color: #7fd0ff;
             position: relative;
             overflow: visible;
             display: flex;
             flex-direction: column;
         }
-        .top-row {
-            display: block;
-            flex: 1;
-        }
+        .top-row { display: block; flex: 1; }
         h1 {
             text-align: center;
             color: #00aaff;
@@ -60,12 +57,12 @@
             margin-bottom: 10px;
         }
         .status {
-            background: rgba(20, 30, 50, 0.95);
+            background: rgba(20,30,50,0.95);
             padding: 20px;
             border-radius: 8px;
             margin: 20px 0;
             border: 1px solid #00a0ff;
-            box-shadow: 0 0 15px rgba(0, 160, 255, 0.6);
+            box-shadow: 0 0 15px rgba(0,160,255,0.6);
             max-height: 150px;
             overflow: hidden;
         }
@@ -85,24 +82,17 @@
         .connect-btn:hover {
             background: linear-gradient(45deg, #0077ff, #0055cc);
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0, 160, 255, 0.7);
+            box-shadow: 0 8px 20px rgba(0,160,255,0.7);
         }
         .connect-btn.connecting {
             background: linear-gradient(45deg, #00ff88, #00cc66);
             animation: pulse 1s infinite;
         }
         @keyframes pulse {
-            0%,
-            100% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.05);
-            }
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
         }
-        #status {
-            font-weight: bold;
-        }
+        #status { font-weight: bold; }
         #players {
             list-style: none;
             padding: 0;
@@ -111,16 +101,14 @@
             margin: 10px 0;
         }
         #players li {
-            background: rgba(20, 30, 50, 0.9);
+            background: rgba(20,30,50,0.9);
             margin: 5px 0;
             padding: 8px;
             border-radius: 4px;
             border-left: 3px solid #00a0ff;
             color: #a8dfff;
         }
-        section {
-            margin-bottom: 10px;
-        }
+        section { margin-bottom: 10px; }
         .logo-bar {
             display: flex;
             justify-content: center;
@@ -128,10 +116,9 @@
             margin-bottom: 8px;
             position: relative;
         }
-        .logo-img,
-        .char-img {
-            transition: all 0.6s ease-out;
-            filter: drop-shadow(0 0 10px rgba(0, 160, 255, 0.8));
+        .logo-img, .char-img {
+            transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
             transform-origin: center;
         }
         .logo-img {
@@ -143,32 +130,41 @@
         }
         .logo-img:hover {
             transform: scale(1.15);
-            filter: drop-shadow(0 0 20px rgba(0, 200, 255, 1));
+            filter: drop-shadow(0 0 20px rgba(0,200,255,1));
         }
-        /* Animação customizada para zoom e rotação */
+        /* ANIMAÇÃO PERFEITA: CENTRO + ZOOM + ROTAÇÃO CONTÍNUA */
         .logo-img.connect-anim {
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
             z-index: 1000 !important;
             max-height: 250px !important;
-            filter: drop-shadow(0 0 50px rgba(0, 200, 255, 1)) !important;
-            animation: zoomRotate 3s ease forwards;
+            filter: drop-shadow(0 0 50px rgba(0,200,255,1)) !important;
+            animation: logoConnectPerfect 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
         }
-        @keyframes zoomRotate {
+        @keyframes logoConnectPerfect {
             0% {
                 transform: translate(-50%, -50%) scale(1) rotate(0deg);
+                position: fixed;
             }
-            100% {
+            15% {
+                transform: translate(-50%, -50%) scale(3.5) rotate(180deg);
+            }
+            30% {
                 transform: translate(-50%, -50%) scale(4) rotate(360deg);
             }
-        }
-        @keyframes zoomReverseRotate {
-            0% {
-                transform: translate(-50%, -50%) scale(4) rotate(0deg);
+            50% {
+                transform: translate(-50%, -50%) scale(3.8) rotate(540deg);
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(3) rotate(720deg);
+            }
+            85% {
+                transform: translate(-50%, -50%) scale(1.5) rotate(900deg);
             }
             100% {
-                transform: translate(-50%, -50%) scale(1) rotate(360deg);
+                transform: translate(-50%, -50%) scale(1) rotate(1080deg);
+                filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
             }
         }
         .char-img {
@@ -182,143 +178,108 @@
         }
         .char-img:hover {
             transform: translateY(-12px) scale(1.08);
-            filter: drop-shadow(0 0 35px rgba(0, 200, 255, 1));
+            filter: drop-shadow(0 0 35px rgba(0,200,255,1));
         }
         @media (max-width: 900px) {
-            .container {
-                margin: 10px;
-                padding: 20px;
-            }
+            .container { margin: 10px; padding: 20px; }
             .char-img {
                 position: static !important;
                 display: block;
                 margin: 20px auto 0 auto;
                 max-height: 260px;
             }
-            .logo-img {
-                max-height: 60px;
-            }
-            .logo-img:hover {
-                transform: scale(1.1);
-            }
-            .logo-img.connect-anim {
-                max-height: 180px !important;
-            }
-            h1 {
-                font-size: 1.8em;
-            }
+            .logo-img { max-height: 60px; }
+            .logo-img:hover { transform: scale(1.1); }
+            .logo-img.connect-anim { max-height: 180px !important; }
+            h1 { font-size: 1.8em; }
         }
     </style>
 </head>
 <body>
-    <!-- Música de fundo -->
     <audio id="bg-music" src="musica.mp3" loop preload="auto"></audio>
 
     <div class="container">
         <div class="top-row">
             <div class="logo-bar">
-                <img
-                    id="logoAnim"
-                    src="logo-santaluzia.png"
-                    alt="Santa Luzia RP"
-                    class="logo-img"
-                />
+                <img id="logoAnim" src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
             </div>
             <h1>🥷 Servidor MTA:SA - Santa Luzia RP 🥷</h1>
 
             <section>
-                <h2 style="margin-top: 0;">📊 Status do Servidor</h2>
+                <h2 style="margin-top:0;">📊 Status do Servidor</h2>
                 <div id="status" class="status">A carregar status do servidor...</div>
                 <ul id="players"></ul>
-                <button id="connectBtn" class="connect-btn" onclick="connectMTA()">
-                    🚀 Conectar ao Servidor
-                </button>
+                <button id="connectBtn" class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
             </section>
         </div>
 
-        <!-- Personagem -->
-        <img src="person.png" alt="Personagem" class="char-img" />
+        <img src="person.png" alt="Personagem" class="char-img">
     </div>
 
     <script>
-        const SERVER_IP = "173.212.194.106";
+        const SERVER_IP = '173.212.194.106';
         const SERVER_PORT = 22003;
-        const API_URL = "https://mtasa-status-api.vercel.app/api/status";
+        const API_URL = 'https://mtasa-status-api.vercel.app/api/status';
 
-        const music = document.getElementById("bg-music");
-        const logo = document.getElementById("logoAnim");
-        const connectBtn = document.getElementById("connectBtn");
+        const music = document.getElementById('bg-music');
+        const logo = document.getElementById('logoAnim');
+        const connectBtn = document.getElementById('connectBtn');
         let musicPlayed = false;
         let connecting = false;
 
         function tryPlayMusic() {
             if (!musicPlayed && music.paused) {
-                music.play()
-                    .then(() => {
-                        console.log("✅ Música tocando");
-                        musicPlayed = true;
-                    })
-                    .catch((e) => {
-                        console.log("Autoplay bloqueado, aguardando interação:", e);
-                    });
+                music.play().then(() => {
+                    console.log('✅ Música tocando');
+                    musicPlayed = true;
+                }).catch(e => {
+                    console.log('Autoplay bloqueado:', e);
+                });
             }
         }
 
-        window.addEventListener("load", tryPlayMusic);
-
-        const interactions = ["click", "mousemove", "touchstart", "keydown"];
-        interactions.forEach((event) => {
-            document.addEventListener(
-                event,
-                () => {
-                    tryPlayMusic();
-                },
-                { once: true, passive: true }
-            );
+        window.addEventListener('load', tryPlayMusic);
+        ['click', 'mousemove', 'touchstart', 'keydown'].forEach(event => {
+            document.addEventListener(event, tryPlayMusic, { once: true, passive: true });
         });
 
         function connectMTA() {
             if (connecting) return;
             connecting = true;
 
-            // Remove qualquer animação anterior e força estado inicial
-            logo.style.animation = "none";
-            void logo.offsetWidth; // trigger reflow
+            // Limpa animações anteriores
+            logo.style.animation = 'none';
+            logo.offsetHeight; // Force reflow
 
-            // Aplica animação zoom + rotação (3s)
-            logo.classList.add("connect-anim");
+            // Inicia animação perfeita + ativa botão connecting
+            logo.classList.add('connect-anim');
+            connectBtn.classList.add('connecting');
+            connectBtn.textContent = '🚀 Conectando...';
 
-            // Depois dos 3s, aplica a animação reversa (zoom-out + rotação, 3s)
-            setTimeout(() => {
-                logo.style.animation = "zoomReverseRotate 3s ease forwards";
-            }, 3000);
-
-            // MTA abre após 6s
+            // MTA abre após 6s (fim da animação)
             setTimeout(() => {
                 const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
                 window.location.href = url;
             }, 6000);
         }
 
-        // Reseta animações após todas (6s)
-        logo.addEventListener("animationend", (e) => {
-            if (e.animationName === "zoomReverseRotate") {
-                setTimeout(() => {
-                    logo.classList.remove("connect-anim");
-                    logo.style.animation = "";
-                    connectBtn.classList.remove("connecting");
-                    connectBtn.textContent = "🚀 Conectar ao Servidor";
-                    connecting = false;
-                }, 100);
-            }
+        // Reset quando animação termina
+        logo.addEventListener('animationend', () => {
+            setTimeout(() => {
+                logo.classList.remove('connect-anim');
+                logo.style.animation = '';
+                connectBtn.classList.remove('connecting');
+                connectBtn.textContent = '🚀 Conectar ao Servidor';
+                connecting = false;
+            }, 100);
         });
 
         async function fetchStatus() {
-            const statusEl = document.getElementById("status");
-            const playersEl = document.getElementById("players");
+            const statusEl = document.getElementById('status');
+            const playersEl = document.getElementById('players');
 
             statusEl.innerHTML = '<strong>🔄 Carregando...</strong>';
-            playersEl.innerHTML = "";
+            playersEl.innerHTML = '';
 
             try {
                 const controller = new AbortController();
@@ -327,7 +288,7 @@
                 const res = await fetch(API_URL, { signal: controller.signal });
                 clearTimeout(timeoutId);
 
-                if (!res.ok) throw new Error("API indisponível");
+                if (!res.ok) throw new Error('API indisponível');
 
                 const data = await res.json();
 
@@ -341,27 +302,27 @@
                     statusEl.innerHTML = `
                         <strong style="color:#00ff88;">🟢 Online</strong> | 
                         ${data.playerCount}/${data.playerSlots} Jogadores | 
-                        Mapa: ${data.mapName || "N/A"}<br>
-                        Versão: ${data.version || "N/A"} | Senha: Não
+                        Mapa: ${data.mapName || 'N/A'}<br>
+                        Versão: ${data.version || 'N/A'} | Senha: Não
                     `;
                 } else {
                     statusEl.innerHTML = `
                         <strong style="color:#ffaa00;">🟡 Online (sem jogadores)</strong> | 
-                        0/${data.playerSlots || "?"} | Mapa: ${data.mapName || "N/A"}
+                        0/${data.playerSlots || '?'} | Mapa: ${data.mapName || 'N/A'}
                     `;
                 }
 
                 if (!data.passworded && Array.isArray(data.players) && data.players.length) {
-                    playersEl.innerHTML = data.players
-                        .slice(0, 8)
-                        .map((p) => `<li>${p.name} - ${p.ping}ms</li>`)
-                        .join("");
+                    playersEl.innerHTML = data.players.slice(0, 8)
+                        .map(p => `<li>${p.name} - ${p.ping}ms</li>`)
+                        .join('');
                     if (data.players.length > 8) {
-                        playersEl.innerHTML += `<li style="color:#ffaa00;">+${data.players.length - 8} mais...</li>`;
+                        playersEl.innerHTML += `<li style="color:#ffaa00;">+${data.players.length-8} mais...</li>`;
                     }
                 } else if (!data.passworded) {
                     playersEl.innerHTML = '<li style="color:#ffaa00;">Nenhum jogador online</li>';
                 }
+
             } catch (e) {
                 statusEl.innerHTML = `
                     <strong style="color:#ff6666;">🔴 Status indisponível</strong><br>
