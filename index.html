@@ -26,6 +26,8 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            /* EVITA ZOOM DA PÁGINA */
+            transform: none !important;
         }
         .container {
             max-width: 1000px;
@@ -42,6 +44,9 @@
             overflow: visible;
             display: flex;
             flex-direction: column;
+            /* ESTABILIZA CONTAINER */
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         .top-row { display: block; flex: 1; }
         h1 {
@@ -119,7 +124,8 @@
         .logo-img, .char-img {
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
-            transform-origin: center;
+            transform-origin: center center;
+            will-change: transform;
         }
         .logo-img {
             max-height: 80px;
@@ -132,39 +138,36 @@
             transform: scale(1.15);
             filter: drop-shadow(0 0 20px rgba(0,200,255,1));
         }
-        /* ANIMAÇÃO PERFEITA: CENTRO + ZOOM + ROTAÇÃO CONTÍNUA */
+        /* ANIMAÇÃO SUAVE E PRECISA - SEM PUXÕES */
         .logo-img.connect-anim {
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
             z-index: 1000 !important;
             max-height: 250px !important;
+            width: auto !important;
             filter: drop-shadow(0 0 50px rgba(0,200,255,1)) !important;
-            animation: logoConnectPerfect 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            transform-origin: center center !important;
+            animation: logoSpinPerfect 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
         }
-        @keyframes logoConnectPerfect {
+        @keyframes logoSpinPerfect {
             0% {
                 transform: translate(-50%, -50%) scale(1) rotate(0deg);
-                position: fixed;
             }
-            15% {
-                transform: translate(-50%, -50%) scale(3.5) rotate(180deg);
+            20% {
+                transform: translate(-50%, -50%) scale(2.5) rotate(120deg);
             }
-            30% {
-                transform: translate(-50%, -50%) scale(4) rotate(360deg);
+            40% {
+                transform: translate(-50%, -50%) scale(3.8) rotate(360deg);
             }
-            50% {
-                transform: translate(-50%, -50%) scale(3.8) rotate(540deg);
+            60% {
+                transform: translate(-50%, -50%) scale(4) rotate(540deg);
             }
-            70% {
-                transform: translate(-50%, -50%) scale(3) rotate(720deg);
-            }
-            85% {
-                transform: translate(-50%, -50%) scale(1.5) rotate(900deg);
+            80% {
+                transform: translate(-50%, -50%) scale(2.5) rotate(720deg);
             }
             100% {
                 transform: translate(-50%, -50%) scale(1) rotate(1080deg);
-                filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
             }
         }
         .char-img {
@@ -247,27 +250,30 @@
             if (connecting) return;
             connecting = true;
 
-            // Limpa animações anteriores
+            // LIMPEZA TOTAL PARA EVITAR PUXÕES
             logo.style.animation = 'none';
-            logo.offsetHeight; // Force reflow
+            logo.style.transform = '';
+            logo.offsetHeight; // Force reflow completo
 
-            // Inicia animação perfeita + ativa botão connecting
-            logo.classList.add('connect-anim');
-            connectBtn.classList.add('connecting');
-            connectBtn.textContent = '🚀 Conectando...';
+            // Inicia animação SUAVE
+            requestAnimationFrame(() => {
+                logo.classList.add('connect-anim');
+                connectBtn.classList.add('connecting');
+                connectBtn.textContent = '🚀 Conectando...';
+            });
 
-            // MTA abre após 6s (fim da animação)
+            // MTA abre após 6s
             setTimeout(() => {
                 const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
                 window.location.href = url;
             }, 6000);
         }
 
-        // Reset quando animação termina
         logo.addEventListener('animationend', () => {
             setTimeout(() => {
                 logo.classList.remove('connect-anim');
                 logo.style.animation = '';
+                logo.style.transform = '';
                 connectBtn.classList.remove('connecting');
                 connectBtn.textContent = '🚀 Conectar ao Servidor';
                 connecting = false;
