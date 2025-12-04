@@ -87,6 +87,14 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 20px rgba(0,160,255,0.7);
         }
+        .connect-btn.connecting {
+            background: linear-gradient(45deg, #00ff88, #00cc66);
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
         #status { font-weight: bold; }
         #players { 
             list-style: none; 
@@ -111,6 +119,7 @@
             justify-content: center;
             align-items: center;
             margin-bottom: 8px;
+            position: relative;
         }
         .logo-img, .char-img {
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -121,10 +130,37 @@
             max-height: 80px;
             width: auto;
             object-fit: contain;
+            position: relative;
+            z-index: 20;
         }
         .logo-img:hover {
             transform: scale(1.15);
             filter: drop-shadow(0 0 20px rgba(0,200,255,1));
+        }
+        /* ANIMAÇÃO ESPECIAL DO BOTÃO CONECTAR */
+        .logo-img.connect-anim {
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) scale(3) rotate(360deg) !important;
+            z-index: 1000 !important;
+            max-height: 200px !important;
+            filter: drop-shadow(0 0 40px rgba(0,200,255,1)) !important;
+            animation: logoConnectAnim 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+        }
+        @keyframes logoConnectAnim {
+            0% {
+                transform: translate(-50%, -50%) scale(3) rotate(360deg);
+                filter: drop-shadow(0 0 40px rgba(0,200,255,1));
+            }
+            70% {
+                transform: translate(-50%, -50%) scale(4) rotate(540deg);
+                filter: drop-shadow(0 0 60px rgba(0,255,150,1));
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0);
+                filter: drop-shadow(0 0 0 rgba(0,255,150,0));
+            }
         }
         .char-img {
             position: absolute;
@@ -156,6 +192,9 @@
             .logo-img:hover {
                 transform: scale(1.1);
             }
+            .logo-img.connect-anim {
+                max-height: 150px !important;
+            }
             h1 {
                 font-size: 1.8em;
             }
@@ -169,7 +208,7 @@
     <div class="container">
         <div class="top-row">
             <div class="logo-bar">
-                <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
+                <img id="logoAnim" src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
             </div>
             <h1>🥷 Servidor MTA:SA - Santa Luzia RP 🥷</h1>
 
@@ -177,11 +216,11 @@
                 <h2 style="margin-top:0;">📊 Status do Servidor</h2>
                 <div id="status" class="status">A carregar status do servidor...</div>
                 <ul id="players"></ul>
-                <button class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
+                <button id="connectBtn" class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
             </section>
         </div>
 
-        <!-- Personagem - AGORA COM HOVER FUNCIONANDO -->
+        <!-- Personagem -->
         <img src="person.png" alt="Personagem" class="char-img">
     </div>
 
@@ -191,6 +230,8 @@
         const API_URL = 'https://mtasa-status-api.vercel.app/api/status';
 
         const music = document.getElementById('bg-music');
+        const logo = document.getElementById('logoAnim');
+        const connectBtn = document.getElementById('connectBtn');
         let musicPlayed = false;
 
         // Função para tentar tocar música
@@ -208,7 +249,7 @@
         // Tenta tocar ao carregar página
         window.addEventListener('load', tryPlayMusic);
 
-        // Ativa música com qualquer interação (uma única vez por tipo)
+        // Ativa música com qualquer interação
         const interactions = ['click', 'mousemove', 'touchstart', 'keydown'];
         interactions.forEach(event => {
             document.addEventListener(event, () => {
@@ -216,11 +257,26 @@
             }, { once: true, passive: true });
         });
 
-        // Função de conexão MTA
+        // CONEXÃO MTA COM ANIMAÇÃO ÉPICA DA LOGO
         function connectMTA() {
-            const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
-            window.location.href = url;
+            // Animação da logo
+            logo.classList.add('connect-anim');
+            connectBtn.classList.add('connecting');
+            connectBtn.textContent = '🚀 Conectando...';
+            
+            // Toca MTA após 1.2s (duração da animação)
+            setTimeout(() => {
+                const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
+                window.location.href = url;
+            }, 1200);
         }
+
+        // Remove animação quando voltar (caso MTA falhe)
+        logo.addEventListener('animationend', () => {
+            logo.classList.remove('connect-anim');
+            connectBtn.classList.remove('connecting');
+            connectBtn.textContent = '🚀 Conectar ao Servidor';
+        });
 
         // Status do servidor
         async function fetchStatus() {
@@ -276,7 +332,6 @@
             }
         }
 
-        // Inicia status e atualiza a cada 30s
         fetchStatus();
         setInterval(fetchStatus, 30000);
     </script>    
