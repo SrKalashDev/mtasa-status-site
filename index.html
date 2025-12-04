@@ -17,8 +17,6 @@
             background-position: center center;
             background-size: cover;
             background-attachment: fixed;
-            margin: 0;
-            padding: 0;
             min-height: 100vh;
             height: 100vh;
             color: #fff;
@@ -26,8 +24,6 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            /* EVITA ZOOM DA PÁGINA */
-            transform: none !important;
         }
         .container {
             max-width: 1000px;
@@ -44,9 +40,6 @@
             overflow: visible;
             display: flex;
             flex-direction: column;
-            /* ESTABILIZA CONTAINER */
-            transform: translateZ(0);
-            backface-visibility: hidden;
         }
         .top-row { display: block; flex: 1; }
         h1 {
@@ -125,7 +118,6 @@
             transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
             transform-origin: center center;
-            will-change: transform;
         }
         .logo-img {
             max-height: 80px;
@@ -138,38 +130,26 @@
             transform: scale(1.15);
             filter: drop-shadow(0 0 20px rgba(0,200,255,1));
         }
-        /* ANIMAÇÃO SUAVE E PRECISA - SEM PUXÕES */
-        .logo-img.connect-anim {
-            position: fixed !important;
-            top: 50% !important;
-            left: 50% !important;
-            z-index: 1000 !important;
-            max-height: 250px !important;
-            width: auto !important;
-            filter: drop-shadow(0 0 50px rgba(0,200,255,1)) !important;
-            transform-origin: center center !important;
-            animation: logoSpinPerfect 6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+
+        /* CLONE NO CENTRO PARA ANIMAÇÃO */
+        .logo-fx {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            z-index: 1000;
+            max-height: 220px;
+            pointer-events: none;
+            filter: drop-shadow(0 0 40px rgba(0,200,255,1));
+            animation: logoZoomFX 3s ease-out forwards;
         }
-        @keyframes logoSpinPerfect {
-            0% {
-                transform: translate(-50%, -50%) scale(1) rotate(0deg);
-            }
-            20% {
-                transform: translate(-50%, -50%) scale(2.5) rotate(120deg);
-            }
-            40% {
-                transform: translate(-50%, -50%) scale(3.8) rotate(360deg);
-            }
-            60% {
-                transform: translate(-50%, -50%) scale(4) rotate(540deg);
-            }
-            80% {
-                transform: translate(-50%, -50%) scale(2.5) rotate(720deg);
-            }
-            100% {
-                transform: translate(-50%, -50%) scale(1) rotate(1080deg);
-            }
+        @keyframes logoZoomFX {
+            0%   { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+            10%  { transform: translate(-50%, -50%) scale(1.4); opacity: 1; }
+            50%  { transform: translate(-50%, -50%) scale(1.8); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(2.2); opacity: 0; }
         }
+
         .char-img {
             position: absolute;
             right: -140px;
@@ -192,8 +172,6 @@
                 max-height: 260px;
             }
             .logo-img { max-height: 60px; }
-            .logo-img:hover { transform: scale(1.1); }
-            .logo-img.connect-anim { max-height: 180px !important; }
             h1 { font-size: 1.8em; }
         }
     </style>
@@ -232,53 +210,41 @@
 
         function tryPlayMusic() {
             if (!musicPlayed && music.paused) {
-                music.play().then(() => {
-                    console.log('✅ Música tocando');
-                    musicPlayed = true;
-                }).catch(e => {
-                    console.log('Autoplay bloqueado:', e);
-                });
+                music.play().catch(() => {});
+                musicPlayed = true;
             }
         }
 
         window.addEventListener('load', tryPlayMusic);
-        ['click', 'mousemove', 'touchstart', 'keydown'].forEach(event => {
-            document.addEventListener(event, tryPlayMusic, { once: true, passive: true });
+        ['click', 'mousemove', 'touchstart', 'keydown'].forEach(ev => {
+            document.addEventListener(ev, tryPlayMusic, { once: true, passive: true });
         });
 
         function connectMTA() {
             if (connecting) return;
             connecting = true;
 
-            // LIMPEZA TOTAL PARA EVITAR PUXÕES
-            logo.style.animation = 'none';
-            logo.style.transform = '';
-            logo.offsetHeight; // Force reflow completo
+            // cria clone da logo no centro
+            const clone = logo.cloneNode(true);
+            clone.classList.remove('logo-img');
+            clone.classList.add('logo-fx');
+            document.body.appendChild(clone);
 
-            // Inicia animação SUAVE
-            requestAnimationFrame(() => {
-                logo.classList.add('connect-anim');
-                connectBtn.classList.add('connecting');
-                connectBtn.textContent = '🚀 Conectando...';
-            });
+            connectBtn.classList.add('connecting');
+            connectBtn.textContent = '🚀 Conectando...';
 
-            // MTA abre após 6s
+            // remove clone após 3s (quando animação acaba)
             setTimeout(() => {
-                const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
-                window.location.href = url;
-            }, 6000);
-        }
-
-        logo.addEventListener('animationend', () => {
-            setTimeout(() => {
-                logo.classList.remove('connect-anim');
-                logo.style.animation = '';
-                logo.style.transform = '';
+                clone.remove();
                 connectBtn.classList.remove('connecting');
                 connectBtn.textContent = '🚀 Conectar ao Servidor';
                 connecting = false;
-            }, 100);
-        });
+            }, 3000);
+
+            // abre MTA logo de seguida
+            const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
+            window.location.href = url;
+        }
 
         async function fetchStatus() {
             const statusEl = document.getElementById('status');
@@ -296,7 +262,7 @@
 
                 if (!res.ok) throw new Error('API indisponível');
 
-                const data = await res.json();
+                const data = await res.json();  // formato típico API MTA não-oficial [web:9]
 
                 if (data.passworded) {
                     statusEl.innerHTML = `
