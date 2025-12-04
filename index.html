@@ -1,10 +1,15 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servidor MTA:SA - Santa Luzia RP</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body { 
             font-family: Arial, sans-serif; 
             background-image: url('BANNER.jpg');
@@ -15,14 +20,17 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            height: 100vh;
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: hidden; /* Remove barras de rolagem */
         }
         .container { 
             max-width: 1000px; 
             width: 100%;
+            max-height: 100vh;
             margin: 20px;
             padding: 30px; 
             background: rgba(10,10,20,0.95);
@@ -32,19 +40,24 @@
             color: #7fd0ff;
             position: relative;
             overflow: visible;
+            display: flex;
+            flex-direction: column;
         }
         .top-row {
             display: block;
+            flex: 1;
         }
         h1 { 
             text-align: center; 
             color: #00aaff;
             text-shadow: 0 0 25px #00aaff;
             font-size: 2.2em;
+            margin-bottom: 10px;
         }
         h2 {
             color: #7fd0ff;
             text-shadow: 0 0 15px #00a0ff;
+            margin-bottom: 10px;
         }
         .status { 
             background: rgba(20,30,50,0.95); 
@@ -53,6 +66,8 @@
             margin: 20px 0;
             border: 1px solid #00a0ff;
             box-shadow: 0 0 15px rgba(0,160,255,0.6);
+            max-height: 150px;
+            overflow: hidden;
         }
         .connect-btn { 
             background: linear-gradient(45deg, #00aaff, #0077ff); 
@@ -65,6 +80,7 @@
             width: 100%;
             font-weight: bold;
             transition: 0.3s;
+            margin: 10px 0;
         }
         .connect-btn:hover { 
             background: linear-gradient(45deg, #0077ff, #0055cc);
@@ -72,7 +88,13 @@
             box-shadow: 0 8px 20px rgba(0,160,255,0.7);
         }
         #status { font-weight: bold; }
-        #players { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
+        #players { 
+            list-style: none; 
+            padding: 0; 
+            max-height: 120px; 
+            overflow-y: auto;
+            margin: 10px 0;
+        }
         #players li { 
             background: rgba(20,30,50,0.9); 
             margin: 5px 0; 
@@ -104,29 +126,37 @@
             filter: drop-shadow(0 0 18px rgba(0,160,255,0.8));
             transition: transform 0.3s ease, filter 0.3s ease;
             transform-origin: bottom center;
+            pointer-events: none;
         }
         .char-img:hover {
             transform: translateY(-6px) scale(1.03);
             filter: drop-shadow(0 0 28px rgba(0,200,255,1));
         }
         @media (max-width: 900px) {
+            .container {
+                margin: 10px;
+                padding: 20px;
+            }
             .char-img {
                 position: static;
                 display: block;
                 margin: 20px auto 0 auto;
                 max-height: 260px;
             }
+            h1 {
+                font-size: 1.8em;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- Música de fundo, autoplay ao carregar a página -->
+    <!-- Música de fundo -->
     <audio id="bg-music" src="musica.mp3" loop preload="auto"></audio>
 
-    <div class="container" id="container">
+    <div class="container">
         <div class="top-row">
             <div class="logo-bar">
-                <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img" />
+                <img src="logo-santaluzia.png" alt="Santa Luzia RP" class="logo-img">
             </div>
             <h1>🥷 Servidor MTA:SA - Santa Luzia RP 🥷</h1>
 
@@ -139,7 +169,7 @@
         </div>
 
         <!-- Personagem -->
-        <img src="person.png" alt="Personagem" class="char-img" />
+        <img src="person.png" alt="Personagem" class="char-img">
     </div>
 
     <script>
@@ -148,36 +178,38 @@
         const API_URL = 'https://mtasa-status-api.vercel.app/api/status';
 
         const music = document.getElementById('bg-music');
+        let musicPlayed = false;
 
-        // Tocar música imediatamente ao carregar página ou com qualquer interação na tela (inclui passar mouse)
-        function playMusic() {
-            if (music.paused) {
-                music.play().catch(e => {
-                    // Pode falhar em alguns browsers por políticas autoplay
-                    console.log('Falha ao tentar tocar música automaticamente.', e);
+        // Função para tentar tocar música
+        function tryPlayMusic() {
+            if (!musicPlayed && music.paused) {
+                music.play().then(() => {
+                    console.log('✅ Música tocando');
+                    musicPlayed = true;
+                }).catch(e => {
+                    console.log('Autoplay bloqueado, aguardando interação:', e);
                 });
             }
         }
 
-        // Tenta tocar ao carregar a página
-        window.addEventListener('load', playMusic);
+        // Tenta tocar ao carregar página
+        window.addEventListener('load', tryPlayMusic);
 
-        // Também ativa ao passar o mouse ou clicar em qualquer lugar da tela (uma vez)
-        const interactionEvents = ['click', 'mousemove', 'touchstart'];
-        const container = document.getElementById('container');
-        function interactionHandler() {
-            playMusic();
-            interactionEvents.forEach(ev => container.removeEventListener(ev, interactionHandler));
-        }
-        interactionEvents.forEach(ev => container.addEventListener(ev, interactionHandler));
+        // Ativa música com qualquer interação (uma única vez por tipo)
+        const interactions = ['click', 'mousemove', 'touchstart', 'keydown'];
+        interactions.forEach(event => {
+            document.addEventListener(event, () => {
+                tryPlayMusic();
+            }, { once: true, passive: true });
+        });
 
-        // Função de conexão para o MTA clicando no botão
+        // Função de conexão MTA
         function connectMTA() {
             const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
             window.location.href = url;
         }
 
-        // Status do servidor com tratamento de erros
+        // Status do servidor
         async function fetchStatus() {
             const statusEl = document.getElementById('status');
             const playersEl = document.getElementById('players');
@@ -187,10 +219,10 @@
 
             try {
                 const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 5000);
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
 
                 const res = await fetch(API_URL, { signal: controller.signal });
-                clearTimeout(timeout);
+                clearTimeout(timeoutId);
 
                 if (!res.ok) throw new Error('API indisponível');
 
@@ -207,35 +239,33 @@
                 } else {
                     statusEl.innerHTML = `
                         <strong style="color:#ffaa00;">🟡 Online (sem jogadores)</strong> | 
-                        0/${data.playerSlots || '?'} Jogadores | 
-                        Mapa: ${data.mapName || 'N/A'}
+                        0/${data.playerSlots || '?'} | Mapa: ${data.mapName || 'N/A'}
                     `;
                 }
 
                 if (Array.isArray(data.players) && data.players.length) {
-                    playersEl.innerHTML = data.players
-                        .slice(0, 10)
+                    playersEl.innerHTML = data.players.slice(0, 8)
                         .map(p => `<li>${p.name} - ${p.ping}ms</li>`)
                         .join('');
-                    if (data.players.length > 10) {
-                        playersEl.innerHTML += `<li style="color:#ffaa00;">+${data.players.length-10} jogadores...</li>`;
+                    if (data.players.length > 8) {
+                        playersEl.innerHTML += `<li style="color:#ffaa00;">+${data.players.length-8} mais...</li>`;
                     }
                 } else {
                     playersEl.innerHTML = '<li style="color:#ffaa00;">Nenhum jogador online</li>';
                 }
 
             } catch (e) {
-                console.log('Erro API:', e.message);
                 statusEl.innerHTML = `
                     <strong style="color:#ff6666;">🔴 Status indisponível</strong><br>
                     <small>IP: ${SERVER_IP}:${SERVER_PORT}</small>
                 `;
-                playersEl.innerHTML = '<li style="color:#ff6666;">Verifique servidor ou tente novamente.</li>';
+                playersEl.innerHTML = '<li style="color:#ff6666;">Tente conectar diretamente</li>';
             }
         }
 
-        setInterval(fetchStatus, 30000);
+        // Inicia status e atualiza a cada 30s
         fetchStatus();
-    </script>
+        setInterval(fetchStatus, 30000);
+    </script>    
 </body>
 </html>
