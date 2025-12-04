@@ -128,7 +128,7 @@
     </style>
 </head>
 <body>
-    <!-- música de fundo: começa em mute, som liga no primeiro clique -->
+    <!-- música de fundo: toca em mute e liga som no primeiro clique [web:338][web:345] -->
     <audio id="bg-music" src="musica.mp3" autoplay loop muted></audio>
 
     <div class="container">
@@ -160,7 +160,7 @@
 
         const music = document.getElementById('bg-music');
 
-        // No primeiro clique em qualquer lado, ativa o som da música
+        // No primeiro clique em qualquer lado, ativa o som da música [web:338][web:345]
         document.addEventListener('click', () => {
             music.muted = false;
         }, { once: true });
