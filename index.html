@@ -30,13 +30,12 @@
             border: 2px solid rgba(0,160,255,0.8);
             box-shadow: 0 0 30px rgba(0,160,255,0.7);
             color: #7fd0ff;
-            position: relative;          /* permite posicionar personagem por cima */
-            overflow: visible;           /* deixa sair para fora */
+            position: relative;
+            overflow: visible;
         }
         .top-row {
             display: block;
         }
-
         h1 { 
             text-align: center; 
             color: #00aaff;
@@ -66,6 +65,7 @@
             width: 100%;
             font-weight: bold;
             transition: 0.3s;
+            margin: 10px 0;
         }
         .connect-btn:hover { 
             background: linear-gradient(45deg, #0077ff, #0055cc);
@@ -73,7 +73,7 @@
             box-shadow: 0 8px 20px rgba(0,160,255,0.7);
         }
         #status { font-weight: bold; }
-        #players { list-style: none; padding: 0; }
+        #players { list-style: none; padding: 0; max-height: 200px; overflow-y: auto; }
         #players li { 
             background: rgba(20,30,50,0.9); 
             margin: 5px 0; 
@@ -96,25 +96,43 @@
             object-fit: contain;
             filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
         }
-
-        /* personagem “fora” do card */
         .char-img {
             position: absolute;
-            right: -140px;   /* bem mais para a direita */
-            bottom: -80px;   /* bem mais para baixo */
+            right: -140px;
+            bottom: -80px;
             max-height: 320px;
             width: auto;
             filter: drop-shadow(0 0 18px rgba(0,160,255,0.8));
             transition: transform 0.3s ease, filter 0.3s ease;
             transform-origin: bottom center;
         }
-
-
         .char-img:hover {
             transform: translateY(-6px) scale(1.03);
             filter: drop-shadow(0 0 28px rgba(0,200,255,1));
         }
-
+        .music-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,160,255,0.9);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,160,255,0.5);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        .music-btn:hover {
+            background: rgba(0,200,255,1);
+            transform: scale(1.1);
+        }
+        .music-btn.active {
+            background: rgba(0,255,0,0.9);
+        }
         @media (max-width: 900px) {
             .char-img {
                 position: static;
@@ -122,12 +140,22 @@
                 margin: 20px auto 0 auto;
                 max-height: 260px;
             }
+            .music-btn {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 16px;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- música de fundo (mute até primeiro clique) -->
-    <audio id="bg-music" src="musica.mp3" autoplay loop muted></audio>
+    <!-- Música de fundo -->
+    <audio id="bg-music" src="musica.mp3" loop preload="auto"></audio>
+    
+    <!-- Botão de som -->
+    <button id="music-toggle" class="music-btn" title="Ativar/Desativar música">🔊</button>
 
     <div class="container">
         <div class="top-row">
@@ -141,10 +169,11 @@
                 <div id="status" class="status">A carregar status do servidor...</div>
                 <ul id="players"></ul>
                 <button class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Servidor</button>
+                <button class="connect-btn" onclick="openServerList()" style="background: linear-gradient(45deg, #ffaa00, #ff7700); margin-top: 5px;">📋 Lista Oficial MTA</button>
             </section>
         </div>
 
-        <!-- personagem sobressaído no canto inferior direito -->
+        <!-- Personagem -->
         <img src="person.png" alt="Personagem" class="char-img">
     </div>
 
@@ -152,61 +181,124 @@
         const SERVER_IP   = '173.212.194.106';
         const SERVER_PORT = 22003;
         const API_URL     = 'https://mtasa-status-api.vercel.app/api/status';
-
+        
         const music = document.getElementById('bg-music');
+        const musicBtn = document.getElementById('music-toggle');
+        let musicEnabled = false;
 
-        // No primeiro clique em qualquer lado, ativa o som da música
-        document.addEventListener('click', () => {
-            music.muted = false;
-        }, { once: true });
+        // Controles de música corrigidos
+        musicBtn.addEventListener('click', toggleMusic);
+        document.addEventListener('click', enableMusicOnFirstClick, { once: true });
 
-        async function fetchStatus() {
-            const statusEl  = document.getElementById('status');
-            const playersEl = document.getElementById('players');
-
-            statusEl.innerHTML  = '<strong>🔄 Carregando...</strong>';
-            playersEl.innerHTML = '';
-
-            try {
-                const res  = await fetch(API_URL);
-                if (!res.ok) throw new Error('API error');
-                const data = await res.json();
-
-                statusEl.innerHTML = `
-                    <strong style="color:${data.playerCount > 0 ? '#00ff88' : '#ffaa00'};">
-                        ${data.playerCount > 0 ? '🟢 Online' : '🟡 Online (sem jogadores)'}
-                    </strong> | ${data.playerCount}/${data.playerSlots} Jogadores | Mapa: ${data.mapName}<br>
-                    Versão: ${data.version} | Senha: ${data.passworded ? 'Sim' : 'Não'}
-                `;
-
-                if (Array.isArray(data.players) && data.players.length) {
-                    playersEl.innerHTML = data.players
-                        .map(p => `<li>${p.name} - ${p.ping} ms</li>`)
-                        .join('');
-                } else {
-                    playersEl.innerHTML = '<li>Nenhum jogador online.</li>';
-                }
-            } catch (e) {
-                statusEl.innerHTML = '<strong style="color:#ff6666;">🔴 Offline ou erro ao consultar.</strong>';
-                playersEl.innerHTML = '';
+        function enableMusicOnFirstClick() {
+            if (!musicEnabled) {
+                music.play().catch(e => console.log('Música iniciada após clique'));
             }
         }
 
-        function connectMTA() {
-            const url = `mtasa://173.212.194.106:22003`;  // Protocolo confirmado mtasa:// [web:2]
-            window.location.href = url;
-            // Fallback: abrir lista oficial se falhar
-            setTimeout(() => {
-                window.open('https://community.multitheftauto.com/?p=servers&q=santa+luzia', '_blank');
-            }, 2000);
+        function toggleMusic() {
+            if (musicEnabled) {
+                music.pause();
+                musicBtn.textContent = '🔇';
+                musicBtn.classList.remove('active');
+            } else {
+                music.play().catch(e => {
+                    console.log('Autoplay bloqueado pelo browser');
+                    alert('Clique em "Conectar" primeiro para ativar som!');
+                });
+                musicBtn.textContent = '🔊';
+                musicBtn.classList.add('active');
+            }
+            musicEnabled = !musicEnabled;
         }
 
+        // Conexão MTA corrigida
+        function connectMTA() {
+            const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
+            console.log('Tentando conectar:', url);
+            
+            // Tenta conectar
+            window.location.href = url;
+            
+            // Fallback após 3 segundos
+            setTimeout(() => {
+                console.log('Fallback: abrindo lista MTA');
+                openServerList();
+            }, 3000);
+        }
 
+        function openServerList() {
+            window.open('https://community.multitheftauto.com/?p=servers&q=santa+luzia', '_blank');
+        }
+
+        // Status do servidor com melhor tratamento de erro
+        async function fetchStatus() {
+            const statusEl = document.getElementById('status');
+            const playersEl = document.getElementById('players');
+
+            statusEl.innerHTML = '<strong>🔄 Carregando...</strong>';
+            playersEl.innerHTML = '';
+
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 5000);
+
+                const res = await fetch(API_URL, { signal: controller.signal });
+                clearTimeout(timeout);
+
+                if (!res.ok) throw new Error('API indisponível');
+
+                const data = await res.json();
+
+                if (data.playerCount > 0) {
+                    statusEl.innerHTML = `
+                        <strong style="color:#00ff88;">🟢 Online</strong> | 
+                        ${data.playerCount}/${data.playerSlots} Jogadores | 
+                        Mapa: ${data.mapName || 'N/A'}<br>
+                        Versão: ${data.version || 'N/A'} | 
+                        Senha: ${data.passworded ? 'Sim' : 'Não'}
+                    `;
+                } else {
+                    statusEl.innerHTML = `
+                        <strong style="color:#ffaa00;">🟡 Online (sem jogadores)</strong> | 
+                        0/${data.playerSlots || '?'} Jogadores | 
+                        Mapa: ${data.mapName || 'N/A'}
+                    `;
+                }
+
+                if (Array.isArray(data.players) && data.players.length) {
+                    playersEl.innerHTML = data.players
+                        .slice(0, 10) // Limita a 10 jogadores
+                        .map(p => `<li>${p.name} - ${p.ping}ms</li>`)
+                        .join('');
+                    if (data.players.length > 10) {
+                        playersEl.innerHTML += `<li style="color:#ffaa00;">+${data.players.length-10} jogadores...</li>`;
+                    }
+                } else {
+                    playersEl.innerHTML = '<li style="color:#ffaa00;">Nenhum jogador online</li>';
+                }
+
+            } catch (e) {
+                console.log('Erro API:', e.message);
+                statusEl.innerHTML = `
+                    <strong style="color:#ff6666;">🔴 Status indisponível</strong><br>
+                    <small>IP: ${SERVER_IP}:${SERVER_PORT} | 
+                    <a href="#" onclick="connectMTA()" style="color:#00aaff;">Testar conexão</a> | 
+                    <a href="https://community.multitheftauto.com/?p=servers&q=santa+luzia" target="_blank" style="color:#00aaff;">Lista MTA</a>
+                    </small>
+                `;
+                playersEl.innerHTML = '<li style="color:#ff6666;">Verifique lista oficial MTA</li>';
+            }
+        }
+
+        // Atualiza status a cada 30s e inicia imediatamente
         setInterval(fetchStatus, 30000);
         fetchStatus();
+
+        // Ativa música no primeiro clique em qualquer botão principal
+        document.querySelector('.connect-btn').addEventListener('click', () => {
+            if (!musicEnabled) toggleMusic();
+        });
     </script>    
 </body>
 </html>
-
-
-
