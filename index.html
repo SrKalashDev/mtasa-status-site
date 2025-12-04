@@ -193,13 +193,20 @@
         }
 
         function connectMTA() {
-            window.location.href = `mtasa://join/${SERVER_IP}:${SERVER_PORT}`;
+            const url = `mtasa://173.212.194.106:22003`;  // Protocolo confirmado mtasa:// [web:2]
+            window.location.href = url;
+            // Fallback: abrir lista oficial se falhar
+            setTimeout(() => {
+                window.open('https://community.multitheftauto.com/?p=servers&q=santa+luzia', '_blank');
+            }, 2000);
         }
+
 
         setInterval(fetchStatus, 30000);
         fetchStatus();
     </script>    
 </body>
 </html>
+
 
 
