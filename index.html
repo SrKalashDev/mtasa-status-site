@@ -137,39 +137,35 @@
             transform: scale(1.15);
             filter: drop-shadow(0 0 20px rgba(0,200,255,1));
         }
-        /* ANIMAÇÃO NOVA: ZOOM + RODA 5s + RODA DNV + VOLTA */
+        /* NOVA ANIMAÇÃO: ZOOM → ESPERA 3s → ZOOM INVERSO → VOLTA */
         .logo-img.connect-anim {
             position: fixed !important;
             top: 50% !important;
             left: 50% !important;
-            transform: translate(-50%, -50%) scale(3) !important;
+            transform: translate(-50%, -50%) scale(4) !important;
             z-index: 1000 !important;
-            max-height: 200px !important;
-            filter: drop-shadow(0 0 40px rgba(0,200,255,1)) !important;
-            animation: logoConnectAnim 7s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+            max-height: 250px !important;
+            filter: drop-shadow(0 0 50px rgba(0,200,255,1)) !important;
+            animation: logoConnectAnim 6s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
         }
         @keyframes logoConnectAnim {
             0% {
-                transform: translate(-50%, -50%) scale(3);
-                filter: drop-shadow(0 0 40px rgba(0,200,255,1));
+                transform: translate(-50%, -50%) scale(1);
+                filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
             }
             20% {
-                transform: translate(-50%, -50%) scale(4) rotate(360deg);
+                transform: translate(-50%, -50%) scale(4);
+                filter: drop-shadow(0 0 50px rgba(0,200,255,1));
             }
             25% {
                 transform: translate(-50%, -50%) scale(4);
             }
-            45% {
-                transform: translate(-50%, -50%) scale(4) rotate(720deg);
-            }
-            50% {
+            95% {
                 transform: translate(-50%, -50%) scale(4);
-            }
-            70% {
-                transform: translate(-50%, -50%) scale(3);
+                filter: drop-shadow(0 0 50px rgba(0,200,255,1));
             }
             100% {
-                transform: translate(-50%, -50%) scale(1) rotate(1080deg);
+                transform: translate(-50%, -50%) scale(1);
                 filter: drop-shadow(0 0 10px rgba(0,160,255,0.8));
                 position: relative !important;
                 top: auto !important;
@@ -207,7 +203,7 @@
                 transform: scale(1.1);
             }
             .logo-img.connect-anim {
-                max-height: 150px !important;
+                max-height: 180px !important;
             }
             h1 {
                 font-size: 1.8em;
@@ -272,24 +268,24 @@
             }, { once: true, passive: true });
         });
 
-        // CONEXÃO MTA COM ANIMAÇÃO DE 7 SEGUNDOS
+        // CONEXÃO MTA COM NOVA ANIMAÇÃO ZOOM INVERSO
         function connectMTA() {
             if (connecting) return;
             connecting = true;
             
-            // Animação da logo (7 segundos)
+            // Animação da logo (6 segundos)
             logo.classList.add('connect-anim');
             connectBtn.classList.add('connecting');
             connectBtn.textContent = '🚀 Conectando...';
             
-            // Abre MTA após 7 segundos (duração total da animação)
+            // Abre MTA após 6 segundos
             setTimeout(() => {
                 const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
                 window.location.href = url;
-            }, 7000);
+            }, 6000);
         }
 
-        // Reseta animação quando terminar (se MTA não abrir)
+        // Reseta animação quando terminar
         logo.addEventListener('animationend', () => {
             setTimeout(() => {
                 logo.classList.remove('connect-anim');
@@ -299,7 +295,7 @@
             }, 100);
         });
 
-        // Status do servidor
+        // Status do servidor COM SENHA = MANUTENÇÃO
         async function fetchStatus() {
             const statusEl = document.getElementById('status');
             const playersEl = document.getElementById('players');
@@ -318,13 +314,19 @@
 
                 const data = await res.json();
 
-                if (data.playerCount > 0) {
+                // ✅ NOVA LÓGICA: SENHA = MANUTENÇÃO
+                if (data.passworded) {
+                    statusEl.innerHTML = `
+                        <strong style="color:#ffaa00;">🔒 EM MANUTENÇÃO</strong><br>
+                        <small>Servidor com senha ativa</small>
+                    `;
+                    playersEl.innerHTML = '<li style="color:#ffaa00;">Aguarde reabertura</li>';
+                } else if (data.playerCount > 0) {
                     statusEl.innerHTML = `
                         <strong style="color:#00ff88;">🟢 Online</strong> | 
                         ${data.playerCount}/${data.playerSlots} Jogadores | 
                         Mapa: ${data.mapName || 'N/A'}<br>
-                        Versão: ${data.version || 'N/A'} | 
-                        Senha: ${data.passworded ? 'Sim' : 'Não'}
+                        Versão: ${data.version || 'N/A'} | Senha: Não
                     `;
                 } else {
                     statusEl.innerHTML = `
@@ -333,14 +335,14 @@
                     `;
                 }
 
-                if (Array.isArray(data.players) && data.players.length) {
+                if (!data.passworded && Array.isArray(data.players) && data.players.length) {
                     playersEl.innerHTML = data.players.slice(0, 8)
                         .map(p => `<li>${p.name} - ${p.ping}ms</li>`)
                         .join('');
                     if (data.players.length > 8) {
                         playersEl.innerHTML += `<li style="color:#ffaa00;">+${data.players.length-8} mais...</li>`;
                     }
-                } else {
+                } else if (!data.passworded) {
                     playersEl.innerHTML = '<li style="color:#ffaa00;">Nenhum jogador online</li>';
                 }
 
