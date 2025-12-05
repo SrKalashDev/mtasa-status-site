@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Servidor MTA:SA - Santa Luzia RP</title>
+    <link rel="icon" type="image/png" href="logo-santaluzia.png">
     <style>
         * {
             margin: 0;
@@ -75,7 +76,7 @@
             width: 100%;
             font-weight: bold;
             transition: 0.3s;
-            margin: 10px 0;
+            margin: 10px 0 5px 0;
         }
         .connect-btn:hover {
             background: linear-gradient(45deg, #0077ff, #0055cc);
@@ -86,6 +87,26 @@
             background: linear-gradient(45deg, #00ff88, #00cc66);
             animation: pulse 1s infinite;
         }
+        /* BOTÃO DISCORD */
+        .discord-btn {
+            background: linear-gradient(45deg, #5865F2, #404EED);
+            color: #fff;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: bold;
+            transition: 0.3s;
+            margin: 0;
+        }
+        .discord-btn:hover {
+            background: linear-gradient(45deg, #404EED, #2b37b8);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(88,101,242,0.7);
+        }
+
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
@@ -131,7 +152,7 @@
             filter: drop-shadow(0 0 20px rgba(0,200,255,1));
         }
 
-        /* CLONE NO CENTRO PARA ANIMAÇÃO */
+        /* clone da logo no meio a fazer zoom 3s */
         .logo-fx {
             position: fixed;
             top: 50%;
@@ -190,11 +211,18 @@
                 <h2 style="margin-top:0;">📊 Status do Servidor</h2>
                 <div id="status" class="status">A carregar status do servidor...</div>
                 <ul id="players"></ul>
-                <button id="connectBtn" class="connect-btn" onclick="connectMTA()">🚀 Conectar ao Santa Luzia Roleplay </button>
+                <button id="connectBtn" class="connect-btn" onclick="connectMTA()">🪐 Conectar ao Servidor</button>
+                <button class="discord-btn" onclick="window.open('https://discord.gg/MDJKDn6syV','_blank')">
+                    💬 Entrar no Discord
+                </button>
             </section>
         </div>
 
         <img src="person.png" alt="Personagem" class="char-img">
+
+        <div style="text-align: center; margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(0,160,255,0.3); font-size: 0.9em; color: rgba(127,208,255,0.7);">
+            Todos os direitos reservados a KalashDev © 2025
+        </div>
     </div>
 
     <script>
@@ -205,43 +233,44 @@
         const music = document.getElementById('bg-music');
         const logo = document.getElementById('logoAnim');
         const connectBtn = document.getElementById('connectBtn');
-        let musicPlayed = false;
+        let musicEnabled = false;
         let connecting = false;
 
-        function tryPlayMusic() {
-            if (!musicPlayed && music.paused) {
-                music.play().catch(() => {});
-                musicPlayed = true;
-            }
+        function startMusic() {
+            if (musicEnabled) return;
+            music.play().then(() => {
+                musicEnabled = true;
+            }).catch(() => {
+                musicEnabled = false;
+            });
         }
 
-        window.addEventListener('load', tryPlayMusic);
-        ['click', 'mousemove', 'touchstart', 'keydown'].forEach(ev => {
-            document.addEventListener(ev, tryPlayMusic, { once: true, passive: true });
+        window.addEventListener('load', startMusic);
+        ['click','mousemove','touchstart','keydown'].forEach(ev => {
+            document.addEventListener(ev, startMusic, { passive: true });
         });
 
         function connectMTA() {
             if (connecting) return;
             connecting = true;
 
-            // cria clone da logo no centro
+            startMusic();
+
             const clone = logo.cloneNode(true);
             clone.classList.remove('logo-img');
             clone.classList.add('logo-fx');
             document.body.appendChild(clone);
 
             connectBtn.classList.add('connecting');
-            connectBtn.textContent = '🪐 Conectando...';
+            connectBtn.textContent = '🚀 Conectando...';
 
-            // remove clone após 3s (quando animação acaba)
             setTimeout(() => {
                 clone.remove();
                 connectBtn.classList.remove('connecting');
-                connectBtn.textContent = '🚀 Conectar ao Servidor';
+                connectBtn.textContent = '🌍 Conectado';
                 connecting = false;
             }, 3000);
 
-            // abre MTA logo de seguida
             const url = `mtasa://${SERVER_IP}:${SERVER_PORT}`;
             window.location.href = url;
         }
@@ -262,7 +291,7 @@
 
                 if (!res.ok) throw new Error('API indisponível');
 
-                const data = await res.json();  // formato típico API MTA não-oficial [web:9]
+                const data = await res.json();
 
                 if (data.passworded) {
                     statusEl.innerHTML = `
@@ -309,5 +338,3 @@
     </script>
 </body>
 </html>
-
-
