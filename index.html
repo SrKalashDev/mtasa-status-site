@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Santa Luzia Roleplay - Status</title>
+    <link rel="icon" type="image/jpg" href="sf2.jpg">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            color: #8BE9FF;
+            font-size: 1.05rem;
+        }
+        
+        .nav-logo {
+            height: 28px;
+            width: auto;
+            border-radius: 6px;
+            object-fit: contain;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: #fff;
+            background-image: linear-gradient(
+                135deg,
+                #000814 0%,
+                #001d3d 35%,
+                #003566 70%,
+                #0077b6 100%
+            );
+            background-attachment: fixed;
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        /* NAVBAR TOP (flutuante e arredondada) */
+        .topnav {
+            position: sticky;
+            top: 10px; /* posição inicial */
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1100px;
+            margin: 10px auto 0 auto;
+            padding: 0.6rem 1.8rem;
+            background: rgba(5, 18, 40, 0.85);
+            backdrop-filter: blur(18px);
+            border-radius: 999px;
+            border: 1px solid rgba(148, 191, 255, 0.7);
+            box-shadow:
+                0 14px 35px rgba(0, 0, 0, 0.8),
+                0 0 18px rgba(56, 189, 248, 0.35);
+            transition: top 0.35s ease; /* anima ao esconder/mostrar */
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.3rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #dbeafe;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0.35rem 0.95rem;
+            border-radius: 999px;
+            transition: background 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+        }
+
+        .nav-links a:hover {
+            background: radial-gradient(circle at top, #1d4ed8, #0f172a);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(59,130,246,0.8);
+            transform: translateY(-1px);
+        }
+
+        .music-btn {
+            border: none;
+            background: transparent;
+            color: #dbeafe;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 0.35rem 0.95rem;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background 0.25s ease, color 0.25s ease,
+                        box-shadow 0.25s ease, transform 0.25s ease;
+        }
+        
+        .music-btn:hover {
+            background: radial-gradient(circle at top, #22c55e, #0f172a);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(34,197,94,0.8);
+            transform: translateY(-1px);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0 1rem 0;
+            position: relative;
+        }
+
+        .server-logo {
+            height: 120px;
+            margin-bottom: 1rem;
+            border-radius: 15px;
+            object-fit: contain;
+            transition: transform 0.4s ease, box-shadow 0.4s ease, filter 0.4s ease;
+            box-shadow: 0 0 0px rgba(70, 102, 255, 0);
+        }
+
+        .server-logo:hover {
+            transform: scale(1.12);
+            box-shadow:
+                0 0 10px rgba(70, 102, 255, 0.9),
+                0 0 25px rgba(70, 102, 255, 0.8),
+                0 0 45px rgba(70, 102, 255, 0.7);
+            filter: saturate(1.3);
+        }
+
+        .server-name {
+            font-size: 3.2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #1F51FF, #4666FF, #00BFFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(31, 81, 255, 0.6);
+            margin-bottom: 1rem;
+        }
+
+        .subtitle {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #79b4ff;
+            text-shadow: 0 0 12px rgba(121,180,255,0.6);
+            margin-bottom: 2.5rem;
+        }
+
+        .status-main {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .status-card-main {
+            width: 260px;
+            height: 210px;
+            background: radial-gradient(circle at top, #1b2547, #050919 70%);
+            border-radius: 20px;
+            border: 1px solid rgba(118,169,250,0.6);
+            box-shadow: 0 18px 45px rgba(0,0,0,0.7);
+            padding: 1.5rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
+        }
+
+        .status-card-main:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.9);
+            border-color: rgba(144,202,249,1);
+        }
+
+        .status-icon-big {
+            font-size: 2.6rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .status-number-big {
+            font-size: 2.3rem;
+            font-weight: 800;
+            color: #4CC9FF;
+            text-shadow: 0 0 12px #4CC9FF;
+        }
+
+        .status-label-big {
+            font-size: 0.95rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #d9e6ff;
+            opacity: 0.85;
+        }
+
+        .status-capacity {
+            font-size: 2.1rem;
+            font-weight: 800;
+            color: #4CC9FF;
+            text-shadow: 0 0 12px #4CC9FF;
+        }
+
+        .status-capacity span {
+            color: #7f8cff;
+            font-size: 1.5rem;
+        }
+
+        .protect-title {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #8BE9FF;
+            text-shadow: 0 0 15px rgba(139,233,255,0.8);
+        }
+
+        .protect-sub {
+            font-size: 0.85rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            opacity: 0.9;
+        }
+
+        .protect-badge {
+            margin-top: 0.5rem;
+            padding: 0.45rem 1.6rem;
+            border-radius: 999px;
+            border: 1px solid #4CC9FF;
+            color: #4CC9FF;
+            font-size: 0.85rem;
+            background: rgba(24,68,130,0.7);
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            background: rgba(5,10,35,0.92);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            border: 1px solid rgba(118,169,250,0.45);
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: rgba(10,20,55,0.98);
+            border-color: rgba(144,202,249,0.9);
+        }
+
+        .card h3 {
+            color: #8BE9FF;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CC9FF, #00B4D8);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(76,201,255,0.7);
+        }
+
+        .maintenance-notice {
+            background: linear-gradient(135deg, #ffc107, #ff9800);
+            color: #333;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(255,193,7,0.4);
+        }
+
+        .password-notice {
+            background: linear-gradient(135deg, #4dabf7, #2196f3);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: bold;
+            box-shadow: 0 10px 30px rgba(59,130,246,0.4);
+        }
+
+        .connect-btn {
+            background: linear-gradient(45deg, #1F51FF, #00BFFF);
+            color: white;
+            padding: 1.2rem 3rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .connect-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(70,102,255,0.55);
+        }
+
+        .connect-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .players-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.9;
+        }
+
+        .player-item:last-child {
+            border-bottom: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: rgba(255,255,255,0.6);
+            font-size: 1.1rem;
+            padding: 3rem;
+        }
+
+        .server-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .info-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(5,10,35,0.92);
+            border-radius: 15px;
+            border: 1px solid rgba(118,169,250,0.45);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 3rem 0 1.5rem 0;
+            text-shadow: 0 0 16px rgba(121,180,255,0.7);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 3rem 0;
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 900px) {
+            .status-main {
+                gap: 1.5rem;
+            }
+            .status-card-main {
+                width: 100%;
+                max-width: 320px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .topnav {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+            .nav-links {
+                width: 100%;
+                justify-content: center;
+            }
+            .server-name { font-size: 2.3rem; }
+            .subtitle { font-size: 1.2rem; }
+            .players-grid { grid-template-columns: 1fr; }
+            .server-logo { height: 90px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- AUDIO que tenta tocar logo ao abrir -->
+    <audio id="bgMusic" src="musica.mp3" autoplay loop></audio>
+
+    <!-- NAVBAR -->
+    <div class="topnav" id="navbar">
+        <div class="nav-left">
+            <img src="sf2.jpg" alt="Logo" class="nav-logo">
+            <span>Santa Luzia RP</span>
+        </div>
+        <div class="nav-links">
+            <a href="#inicio">Página inicial</a>
+            <!-- LinkLoja -->
+            <a href="https://santaluziarp.wrpstore.app"
+            target="_blank"
+            rel="noopener noreferrer">
+                Loja
+            </a>
+            <!-- LinkRegras -->
+            <a href="https://kalashdev.gitbook.io/santa-luzia-rp/"
+            target="_blank"
+            rel="noopener noreferrer">
+                Regras
+            </a>
+            <button id="musicToggle" class="music-btn">⏸ Música</button>
+        </div>
+    </div>
+
+    <!-- PÁGINA INICIAL -->
+    <div class="container" id="inicio">
+        <header class="header">
+            <img src="sf2.jpg" alt="Logo Santa Luzia Roleplay" class="server-logo">
+            <h1 class="server-name">[PT] ✵ SANTA LUZIA ROLEPLAY »</h1>
+            <div class="subtitle">Policiais ● Facções ● Assaltos</div>
+        </header>
+
+        <section class="status-main">
+            <div class="status-card-main">
+                <div class="status-icon-big">👥</div>
+                <div class="status-number-big" id="playerCount">0</div>
+                <div class="status-label-big">ONLINE</div>
+            </div>
+
+            <div class="status-card-main">
+                <div class="status-icon-big">📊</div>
+                <div class="status-capacity">
+                    <span id="playerCountMini">0</span>/<span id="playerSlotsMini">200</span>
+                </div>
+                <div class="status-label-big">CAPACIDADE</div>
+            </div>
+
+            <div class="status-card-main">
+                <div class="status-icon-big">🔒</div>
+                <div class="protect-title" id="protectTitle">PROTEGIDO</div>
+                <div class="protect-sub" id="protectSub">STATUS</div>
+                <div class="protect-badge" id="protectBadge">Servidor com senha</div>
+            </div>
+        </section>
+
+        <div id="statusNotice"></div>
+
+        <div class="players-grid">
+            <div class="card">
+                <h3>📈 Status do Servidor</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <div><strong>Versão:</strong> <span id="version">-</span></div>
+                    <div><strong>Mapa:</strong> <span id="mapName">-</span></div>
+                    <div><strong>Password:</strong> <span id="passwordStatus">-</span></div>
+                </div>
+                <button class="connect-btn" id="connectBtn" onclick="copyIP()">
+                    🔗 COPIAR IP DO SERVIDOR
+                </button>
+            </div>
+
+            <div class="card">
+                <h3>👥 Jogadores Online</h3>
+                <div class="players-list" id="playersList">
+                    <div class="empty-state">
+                        Nenhum jogador online no momento
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="server-info">
+            <div class="info-item">
+                <div style="font-size: 3rem;">⚡</div>
+                <div style="font-size: 1.2rem; margin-top: 0.5rem;">MTA:SA 1.6</div>
+            </div>
+            <div class="info-item">
+                <div style="font-size: 3rem;">🔒</div>
+                <div style="font-size: 1.2rem; margin-top: 0.5rem;">Roleplay Premium</div>
+            </div>
+            <div class="info-item">
+                <div style="font-size: 3rem;">🎮</div>
+                <div style="font-size: 1.2rem; margin-top: 0.5rem;">Policiais | Gangs</div>
+            </div>
+            <div class="info-item">
+                <div style="font-size: 3rem;">💎</div>
+                <div style="font-size: 1.2rem; margin-top: 0.5rem;">Assaltos Avançados</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Info -->
+    <div class="container" id="info">
+        <h2 class="section-title">Informações</h2>
+        <div class="card">
+            <p>Status do servidor atualizando 30 em 30 segundos.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        © 2025 Santa Luzia Roleplay | Feito com ❤️ para MTA:SA por KalashDev
+    </footer>
+
+    <script>
+        const API_URL = 'https://mtasa-status-api.vercel.app/api/status';
+        const SERVER_IP = '173.212.194.106:22003';
+
+        // Música de fundo: tenta tocar logo e usa botão para pausar/retomar
+        const bgMusic = document.getElementById('bgMusic');
+        bgMusic.volume = 0.15;
+
+        let musicPlaying = true;
+        const musicBtn = document.getElementById('musicToggle');
+
+        bgMusic.play().catch(() => {
+            musicPlaying = false;
+            musicBtn.textContent = '🔊 Música';
+        });
+
+        musicBtn.addEventListener('click', () => {
+            if (!musicPlaying) {
+                bgMusic.play().then(() => {
+                    musicPlaying = true;
+                    musicBtn.textContent = '⏸ Música';
+                }).catch(() => {
+                    alert('O navegador bloqueou o som, tenta clicar de novo.');
+                });
+            } else {
+                bgMusic.pause();
+                musicPlaying = false;
+                musicBtn.textContent = '🔊 Música';
+            }
+        });
+
+        // esconder navbar ao descer, mostrar ao subir
+        let lastScrollTop = 0;
+        const nav = document.getElementById('navbar');
+
+        window.addEventListener('scroll', () => {
+            const current = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (current > lastScrollTop && current > 40) {
+                // a descer
+                nav.style.top = '-120px';
+            } else {
+                // a subir
+                nav.style.top = '10px';
+            }
+
+            lastScrollTop = current <= 0 ? 0 : current;
+        });
+
+        async function fetchServerStatus() {
+            try {
+                const response = await fetch(API_URL);
+                const data = await response.json();
+
+                document.getElementById('playerCount').textContent = data.playerCount;
+                document.getElementById('playerCountMini').textContent = data.playerCount;
+                document.getElementById('playerSlotsMini').textContent = data.playerSlots;
+
+                const percentage = data.playerSlots > 0 ? (data.playerCount / data.playerSlots) * 100 : 0;
+                document.getElementById('progressFill').style.width = `${percentage}%`;
+
+                document.getElementById('version').textContent = data.version;
+                document.getElementById('mapName').textContent = data.mapName;
+                document.getElementById('passwordStatus').textContent = data.passworded ? '🔒 Protegido' : '✅ Público';
+
+                const statusNotice = document.getElementById('statusNotice');
+                const protectTitle = document.getElementById('protectTitle');
+                const protectSub = document.getElementById('protectSub');
+                const protectBadge = document.getElementById('protectBadge');
+                const connectBtn = document.getElementById('connectBtn');
+
+                if (data.playerSlots === 0) {
+                    protectTitle.textContent = 'MANUTENÇÃO';
+                    protectSub.textContent = 'STATUS';
+                    protectBadge.textContent = 'Servidor em manutenção';
+
+                    statusNotice.innerHTML = `
+                        <div class="maintenance-notice">
+                            🛠️ Servidor em manutenção<br>
+                            Estamos preparando novidades, volte em breve!
+                        </div>
+                    `;
+                    connectBtn.disabled = true;
+                    connectBtn.textContent = '🔧 EM MANUTENÇÃO';
+                } else if (data.passworded) {
+                    protectTitle.textContent = 'PROTEGIDO';
+                    protectSub.textContent = 'STATUS';
+                    protectBadge.textContent = 'Servidor com senha';
+
+                    statusNotice.innerHTML = `
+                        <div class="password-notice">
+                            🔑 Servidor protegido por senha<br>
+                            Acompanhe chat anuncios do nosso discord!
+                        </div>
+                    `;
+                    connectBtn.disabled = true;
+                    connectBtn.textContent = '🔒 Em Manuntenção';
+                } else {
+                    protectTitle.textContent = 'LIBERADO';
+                    protectSub.textContent = 'STATUS';
+                    protectBadge.textContent = 'Servidor público';
+
+                    statusNotice.innerHTML = '';
+                    connectBtn.disabled = false;
+                    connectBtn.textContent = '🔗 COPIAR IP DO SERVIDOR';
+                }
+
+                const playersList = document.getElementById('playersList');
+                if (data.players && data.players.length > 0) {
+                    playersList.innerHTML = data.players.map(player => `
+                        <div class="player-item">
+                            <span>${player.name || 'Jogador'}</span>
+                        </div>
+                    `).join('');
+                } else {
+                    playersList.innerHTML = `
+                        <div class="empty-state">
+                            Nenhum jogador online no momento
+                        </div>
+                    `;
+                }
+
+            } catch (err) {
+                const protectTitle = document.getElementById('protectTitle');
+                const protectSub = document.getElementById('protectSub');
+                const protectBadge = document.getElementById('protectBadge');
+                protectTitle.textContent = 'ERRO';
+                protectSub.textContent = 'STATUS';
+                protectBadge.textContent = 'Falha ao carregar API';
+            }
+        }
+
+        function copyIP() {
+            navigator.clipboard.writeText(`mtasa://${SERVER_IP}`);
+            const btn = document.getElementById('connectBtn');
+            const originalText = btn.textContent;
+            btn.textContent = '✅ IP COPIADO!';
+            btn.style.background = 'linear-gradient(45deg, #4ade80, #22c55e)';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = 'linear-gradient(45deg, #1F51FF, #00BFFF)';
+            }, 2000);
+        }
+
+        fetchServerStatus();
+        setInterval(fetchServerStatus, 15000);
+    </script>
+</body>
+</html>
