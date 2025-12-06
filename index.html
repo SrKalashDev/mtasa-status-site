@@ -54,7 +54,7 @@
         /* NAVBAR TOP (flutuante e arredondada) */
         .topnav {
             position: sticky;
-            top: 10px; /* posição inicial */
+            top: 10px;
             z-index: 999;
             display: flex;
             align-items: center;
@@ -69,7 +69,7 @@
             box-shadow:
                 0 14px 35px rgba(0, 0, 0, 0.8),
                 0 0 18px rgba(56, 189, 248, 0.35);
-            transition: top 0.35s ease; /* anima ao esconder/mostrar */
+            transition: top 0.35s ease;
         }
 
         .nav-links {
@@ -332,7 +332,7 @@
             font-weight: bold;
             cursor: pointer;
             width: 100%;
-            margin-top: 1.5rem;
+            margin-top: 0;
             transition: all 0.3s ease;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -445,14 +445,14 @@
             <a href="#inicio">Página inicial</a>
             <!-- LinkLoja -->
             <a href="https://santaluziarp.wrpstore.app"
-            target="_blank"
-            rel="noopener noreferrer">
+               target="_blank"
+               rel="noopener noreferrer">
                 Loja
             </a>
             <!-- LinkRegras -->
             <a href="https://kalashdev.gitbook.io/santa-luzia-rp/"
-            target="_blank"
-            rel="noopener noreferrer">
+               target="_blank"
+               rel="noopener noreferrer">
                 Regras
             </a>
             <button id="musicToggle" class="music-btn">⏸ Música</button>
@@ -504,18 +504,18 @@
                     <div><strong>Password:</strong> <span id="passwordStatus">-</span></div>
                 </div>
                 <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.5rem;">
-                    <!-- Entrar direto no servidor -->
-                    <a href="mtasa://173.212.194.106:22003">
+                    <!-- Entrar direto no servidor (pode ser escondido via JS) -->
+                    <a href="mtasa://173.212.194.106:22003" id="joinBtnWrapper">
                         <button class="connect-btn" type="button">
                             🎮 ENTRAR NO SERVIDOR
                         </button>
                     </a>
-                
+
                     <!-- Copiar IP do servidor -->
                     <button class="connect-btn" id="connectBtn" type="button" onclick="copyIP()">
                         🔗 COPIAR IP DO SERVIDOR
                     </button>
-                </div>                
+                </div>
             </div>
 
             <div class="card">
@@ -599,10 +599,8 @@
             const current = window.pageYOffset || document.documentElement.scrollTop;
 
             if (current > lastScrollTop && current > 40) {
-                // a descer
                 nav.style.top = '-120px';
             } else {
-                // a subir
                 nav.style.top = '10px';
             }
 
@@ -630,6 +628,7 @@
                 const protectSub = document.getElementById('protectSub');
                 const protectBadge = document.getElementById('protectBadge');
                 const connectBtn = document.getElementById('connectBtn');
+                const joinBtnWrapper = document.getElementById('joinBtnWrapper');
 
                 if (data.playerSlots === 0) {
                     protectTitle.textContent = 'MANUTENÇÃO';
@@ -644,6 +643,7 @@
                     `;
                     connectBtn.disabled = true;
                     connectBtn.textContent = '🔧 EM MANUTENÇÃO';
+                    if (joinBtnWrapper) joinBtnWrapper.style.display = 'none';
                 } else if (data.passworded) {
                     protectTitle.textContent = 'PROTEGIDO';
                     protectSub.textContent = 'STATUS';
@@ -657,6 +657,7 @@
                     `;
                     connectBtn.disabled = true;
                     connectBtn.textContent = '🔒 Em Manuntenção';
+                    if (joinBtnWrapper) joinBtnWrapper.style.display = 'none';
                 } else {
                     protectTitle.textContent = 'LIBERADO';
                     protectSub.textContent = 'STATUS';
@@ -665,6 +666,7 @@
                     statusNotice.innerHTML = '';
                     connectBtn.disabled = false;
                     connectBtn.textContent = '🔗 COPIAR IP DO SERVIDOR';
+                    if (joinBtnWrapper) joinBtnWrapper.style.display = 'block';
                 }
 
                 const playersList = document.getElementById('playersList');
